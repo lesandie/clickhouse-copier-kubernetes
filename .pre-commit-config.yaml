@@ -1,0 +1,34 @@
+exclude: "\\.snap$"
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-json
+      - id: check-yaml
+      - id: check-xml
+
+  # Linters
+  - repo: https://github.com/comkieffer/pre-commit-xmllint.git
+    rev: 1.0.0
+    hooks:
+      - id: xmllint
+
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.26.3
+    hooks:
+      - id: yamllint
+        args: [-c=.yamllint]
+
+  # Terraform
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.17
+    hooks:
+      - id: tflint
+      - id: shellcheck
+
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.17
+    hooks:
+      - id: terraform-fmt
