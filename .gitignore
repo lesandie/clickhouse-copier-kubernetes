@@ -5,3 +5,4 @@
 .vscode
 csv/
 .pre-commit-config.yaml
+.yamllint
