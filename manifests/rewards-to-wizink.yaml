@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: composer
+spec:
+  containers:
+    - command:
+        - wizink
+        - parse-rewards
+        - --triple-rewards-jsonl
+        - "{TRIPLE_REWARDS_FILE_PATH}"
+        - --triple-rewards-out-dat
+        - "{WIZINK_REWARDS_FILE_PATH}"
+        - --sequence-num
+        - "{XCOM_PREVIOUS}"
+      env:
+        - name: STATSD_HOST
+          value: {STATSD_HOST}
+        - name: STATSD_PORT
+          value: {STATSD_PORT}
+        - name: STATSD_PREFIX
+          value: {STATSD_PREFIX}
+      image: {WIZINK_IMAGE}
+      name: base
+      resources:
+        limits:
+          cpu: "1"
+          memory: 512Mi
+      volumeMounts:
+        - mountPath: {DATA_PREFIX}
+          name: data
+  restartPolicy: Never
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: {PVC_DATA_NAME}

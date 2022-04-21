@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ namespace: composer
+spec:
+ containers:
+   - command:
+       - gsutil
+       - rsync
+       - {DATA_PREFIX}
+       - gs://$(GCS_BUCKET)/{DS_NODASH}-rewards
+     env:
+       - name: GCS_BUCKET
+         valueFrom:
+           secretKeyRef:
+             key: gcs-bucket-name
+             name: wizink
+     image: google/cloud-sdk
+     name: base
+     resources:
+       limits:
+         cpu: "1"
+         memory: 512Mi
+     volumeMounts:
+       - mountPath: {DATA_PREFIX}
+         name: data
+ restartPolicy: Never
+ volumes:
+   - name: data
+     persistentVolumeClaim:
+       claimName: {PVC_DATA_NAME}

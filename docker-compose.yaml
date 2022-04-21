@@ -1,0 +1,31 @@
+---
+version: "3"
+
+services:
+  clickhouse_copier:
+    container_name: clickhouse-copier
+    image: clickhouse/clickhouse-server:21.8
+    # user: "${UID}:${GID}"
+    env_file:
+      - .envrc
+    volumes:
+      - ./configs:/tmp
+    # command: ['clickhouse-copier', '--daemon', '--basedir=/tmp', '--port', '8123']
+    command:
+      - clickhouse-copier
+      - --daemon
+      - --config
+      - "${CH_COPIER_CONFIG}"
+      - --taskpath
+      - "${CH_COPIER_TASKPATH}"
+      - --taskfile
+      - "${CH_COPIER_TASKFILE}"
+      - --basedir="${CH_COPIER_BASEDIR}"
+    networks:
+      - altinity_default
+
+networks:
+  altinity_default:
+    external: true
+# docker-compose run --rm clickhouse_copier clickhouse-copier --daemon --basedir=/tmp ...
+# docker-compose up

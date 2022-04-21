@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  namespace: composer
+spec:
+  containers:
+    - command:
+        - triple-api-cli
+        - get-rewards-from-api
+        - --triple-rewards-jsonl
+        - "{TRIPLE_REWARDS_FILE_PATH}"
+        - --from-date
+        - "{DS_NODASH}"
+        - --to-date
+        - "{NEXT_DS_NODASH}"
+      env:
+        - name: API_URL
+          value: {API_URL}
+        - name: API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: api-token
+              name: wizink
+        - name: STATSD_HOST
+          value: {STATSD_HOST}
+        - name: STATSD_PORT
+          value: {STATSD_PORT}
+        - name: STATSD_PREFIX
+          value: {STATSD_PREFIX}
+      image: {TRIPLE_API_CLI_IMAGE}
+      name: base
+      resources:
+        limits:
+          cpu: "1"
+          memory: 512Mi
+      volumeMounts:
+        - mountPath: {DATA_PREFIX}
+          name: data
+  restartPolicy: Never
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: {PVC_DATA_NAME}
