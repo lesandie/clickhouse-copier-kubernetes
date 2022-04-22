@@ -1,0 +1,36 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: composer
+spec:
+  template:
+    spec:
+      containers:
+        - command:
+            - clickhouse-copier
+            - "--config-file=${CH_COPIER_CONFIG}"
+            - "--task-path=${CH_COPIER_TASKPATH}"
+            - "--task-file=${CH_COPIER_TASKFILE}"
+            - "--base-dir=${CH_COPIER_BASEDIR}"
+          env:
+            - name: CH_COPIER_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  key: gcs-bucket-name
+                  name: basedir-config
+          image: clickhouse/clickhouse-server:21.8
+          name: clickhouse_copier
+          resources:
+            limits:
+              cpu: "1"
+              memory: 4096Mi
+          volumeMounts:
+            - mountPath: "${DATA_PREFIX}"
+              name: data
+      restartPolicy: Never
+    volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: "${PVC_DATA_NAME}"
+  backoffLimit: 4
