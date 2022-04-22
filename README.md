@@ -34,7 +34,8 @@ Copies tables from one cluster to another
 --help
 ```
 
-In docker mode do not use the ```--daemon```  it will generate an error and the container will not launch. Check the following ```docker-compose.yaml```
+In docker mode do not use the ```--daemon```  and ```--status``` they will generate an error and the container will not launch (daemon problems and not allocating a TTY).
+Check the following ```docker-compose.yaml```
 to see which params are used.
 
 ```yaml
