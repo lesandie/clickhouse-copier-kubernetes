@@ -1,8 +1,13 @@
 <clickhouse>
     <!-- Configuration of clusters as in an ordinary server config -->
+    <logger>
+        <level>trace</level>
+        <size>100M</size>
+        <count>3</count>
+    </logger>
     <remote_servers>
-        <cluster_01>
 
+        <cluster_01>
             <shard>
                 <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
                 <!-- <internal_replication>false</internal_replication> -->
@@ -20,7 +25,6 @@
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
-                <internal_replication>true</internal_replication>
             </shard>
         </cluster_01>
 
@@ -37,7 +41,6 @@
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
-                <internal_replication>true</internal_replication>
             </shard>
             <shard>
                 <replica>
@@ -46,9 +49,9 @@
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
-                <internal_replication>true</internal_replication>
             </shard>
         </cluster_02>
+
     </remote_servers>
 
     <!-- How many simultaneously active workers are possible. If you run more workers superfluous workers will sleep. -->
@@ -78,7 +81,7 @@
     -->
     <tables>
         <!-- A table task, copies one table. -->
-        <ventas>
+        <table_ventas>
             <!-- Source cluster name (from <remote_servers/> section) and tables in it that should be copied -->
             <cluster_pull>cluster_01</cluster_pull>
             <database_pull>default</database_pull>
@@ -100,8 +103,8 @@
             -->
             <engine>
                 Engine=ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/fact_venta_evento', '{replica}')
-                PARTITION BY toYYYYMM(fecha_hora_pedido_irlanda)
-                ORDER BY pk
+                PARTITION BY toYYYYMM(fecha_hora_pedido)
+                ORDER BY (id_cadena, id_producto)
                 SETTINGS index_granularity = 8192
             </engine>
 
@@ -129,7 +132,7 @@
                 ...
             </enabled_partitions>
     -->
-        </ventas>
+        </table_ventas>
 
         <!-- Next table to copy. It is not copied until previous table is copying.
         <table_visits>
