@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: composer
+  namespace: xxxxxxx
 spec:
   template:
     spec:
@@ -19,6 +19,8 @@ spec:
                 secretKeyRef:
                   key: gcs-bucket-name
                   name: basedir-config
+            - name: STATSD_HOST
+              value: "${STATSD_HOST}"
           image: clickhouse/clickhouse-server:21.8
           name: clickhouse_copier
           resources:
