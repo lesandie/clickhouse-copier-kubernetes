@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: xxxxxxx
+  namespace: clickhouse_copier
 spec:
   template:
     spec:
@@ -15,24 +15,25 @@ spec:
             - "--base-dir=${CH_COPIER_BASEDIR}"
           env:
             - name: CH_COPIER_CONFIG
-              valueFrom:
-                secretKeyRef:
-                  key: gcs-bucket-name
-                  name: basedir-config
-            - name: STATSD_HOST
-              value: "${STATSD_HOST}"
+              value: "/var/lib/clickhouse/tmp/zookeeper.xml"
+            - name: CH_COPIER_TASKPATH
+              value: "/clickhouse/copier/tasks/task01"
+            - name: CH_COPIER_TASKFILE
+              value: "/var/lib/clickhouse/tmp/task01.yaml"
+            - name: CH_COPIER_BASEDIR
+              value: "/var/lib/clickhouse/tmp"
           image: clickhouse/clickhouse-server:21.8
           name: clickhouse_copier
           resources:
             limits:
               cpu: "1"
-              memory: 4096Mi
+              memory: 2048Mi
           volumeMounts:
-            - mountPath: "${DATA_PREFIX}"
-              name: data
+            - mountPath: /var/lib/clickhouse/tmp
+              name: ch_tmp
+      volumes:
+        - name: ch_tmp
+          configMap:
+            name: copier-config
       restartPolicy: Never
-    volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: "${PVC_DATA_NAME}"
   backoffLimit: 4
