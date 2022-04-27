@@ -27,8 +27,5 @@ repos:
     hooks:
       - id: tflint
       - id: shellcheck
-
-  - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.17
-    hooks:
       - id: terraform-fmt
+      - id: terraform-validate
