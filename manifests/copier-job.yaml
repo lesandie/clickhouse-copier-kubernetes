@@ -2,7 +2,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  namespace: clickhouse_copier
+  namespace: clickhouse-copier
 spec:
   template:
     spec:
@@ -23,16 +23,16 @@ spec:
             - name: CH_COPIER_BASEDIR
               value: "/var/lib/clickhouse/tmp"
           image: clickhouse/clickhouse-server:21.8
-          name: clickhouse_copier
+          name: clickhouse-copier
           resources:
             limits:
               cpu: "1"
               memory: 2048Mi
           volumeMounts:
             - mountPath: /var/lib/clickhouse/tmp
-              name: ch_tmp
+              name: copier-config
       volumes:
-        - name: ch_tmp
+        - name: copier-config
           configMap:
             name: copier-config
       restartPolicy: Never
