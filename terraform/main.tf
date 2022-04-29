@@ -8,16 +8,16 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path = "~/.kube/config.altinity"
 }
 
-resource "kubernetes_namespace" "clickhouse-copier" {
+resource "kubernetes_namespace" "clickhouse_copier" {
   metadata {
     name = var.namespace_job
   }
 }
 
-resource "kubernetes_job" "clickhouse-copier" {
+resource "kubernetes_job" "clickhouse_copier" {
   metadata {
     name = "clickhouse-copier"
     namespace = var.namespace_job
@@ -27,7 +27,7 @@ resource "kubernetes_job" "clickhouse-copier" {
       metadata {}
       spec {
         container {
-          name    = "clickhouse_copier"
+          name    = "clickhouse-copier"
           image   = "clickhouse/clickhouse-server:21.8"
           command = [
             "clickhouse-copier", "--config-file=${var.config_file_job}",
