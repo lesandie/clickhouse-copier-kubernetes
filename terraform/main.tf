@@ -34,6 +34,17 @@ resource "kubernetes_job" "clickhouse-copier" {
             "--task-file=${var.task_file_job}", "--task-path=${var.task_path_job}",
             "--base-dir=${var.base_dir_job}"
           ]
+          volume_mount {
+            mount_path = "/var/lib/clickhouse/tmp"
+            name = "copier-config"
+          }
+        }
+        volume {
+          name = "copier-config"
+          config_map {
+            name = "copier-config"
+            optional = true # <= rejected.
+          }
         }
         restart_policy = "Never"
       }
@@ -47,117 +58,13 @@ resource "kubernetes_job" "clickhouse-copier" {
   }
 }
 
-
-resource "kubernetes_deployment" "clickhouse-copier" {
+resource "kubernetes_config_map" "copier-config" {
   metadata {
-    name      = "clickhouse-copier"
+    name = "copier-config"
     namespace = var.namespace_job
   }
-  spec {
-    replicas = 1
-    selector {
-      match_labels = {
-        app   = "clickhouse-copier"
-        front = "apps"
-      }
-    }
-    template {
-      metadata {
-        labels = {
-          app   = "clickhouse-copier"
-          front = "apps"
-        }
-      }
-      spec {
-        node_name = "kube-master"
-        container {
-          image = "nginx"
-          name  = "clickhouse-copier"
-          port {
-            container_port = 80
-          }
-          volume_mount {
-            mount_path = "/usr/share/nginx/html"
-            name       = "clickhouse-copier"
-          }
-        }
-        volume {
-          name = "clickhouse-copier"
-          persistent_volume_claim {
-            claim_name = "clickhouse-copier"
-          }
-        }
-      }
-    }
-  }
-}
-
-resource "kubernetes_persistent_volume_claim" "clickhouse-copier" {
-  metadata {
-    name = "clickhouse-copier"
-    labels = {
-      app   = "clickhouse-copier"
-      front = "apps"
-    }
-  }
-  spec {
-    access_modes       = ["ReadWriteOnce"]
-    storage_class_name = "clickhouse-copier"
-    resources {
-      requests = {
-        storage = "2Gi"
-      }
-    }
-  }
-}
-
-resource "kubernetes_persistent_volume" "clickhouse-copier" {
-  metadata {
-    name = "clickhouse-copier"
-    labels = {
-      app   = "clickhouse-copier"
-      front = "apps"
-    }
-  }
-  spec {
-    capacity = {
-      storage = "2Gi"
-    }
-    access_modes                     = ["ReadWriteOnce"]
-    storage_class_name               = "clickhouse-copier"
-    persistent_volume_reclaim_policy = "Retain"
-    node_affinity {
-      required {
-        node_selector_term {
-          match_expressions {
-            key      = "kubernetes.io/hostname"
-            operator = "In"
-            values   = ["kube-master"]
-          }
-        }
-      }
-    }
-    persistent_volume_source {
-      local {
-        path = "/home/dnieto"
-      }
-    }
-  }
-}
-
-resource "kubernetes_service" "clickhouse-copier" {
-  metadata {
-    name      = "clickhouse-copier"
-    namespace = var.namespace_job
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.clickhouse-copier.spec.0.template.0.metadata.0.labels.app
-    }
-    type = "LoadBalancer"
-    port {
-      port        = 7070
-      target_port = 80
-    }
+  data = {
+    "zookeeper.yml" = "${file("${path.module}/configs/zookeeper.xml")}"
+    "task01.yml" = "${file("${path.module}/configs/task01.xml")}"
   }
 }
