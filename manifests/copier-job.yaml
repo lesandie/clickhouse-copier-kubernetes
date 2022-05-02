@@ -5,7 +5,8 @@ metadata:
   name: clickhouse-copier-test
   namespace: clickhouse-copier
 spec:
-  ttlSecondsAfterFinished: 86400
+  # only for kubernetes 1.23
+  # ttlSecondsAfterFinished: 86400
   template:
     spec:
       containers:
