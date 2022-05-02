@@ -5,7 +5,7 @@ metadata:
   name: copier-config
   namespace: clickhouse-copier
 data:
-    task01.yaml: |
+    task01.xml: |
         <clickhouse>
             <logger>
                 <level>trace</level>
@@ -13,33 +13,41 @@ data:
                 <count>3</count>
             </logger>
             <remote_servers>
-                <cluster_01>
+                <all-replicated>
                     <shard>
                         <replica>
-                            <host>clickhouse-01</host>
+                            <host>chi-dnieto-test1-dnieto-test1-0-0.eu.svc.cluster.local</host>
                             <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
                         </replica>
                         <replica>
-                            <host>clickhouse-02</host>
+                            <host>chi-dnieto-test1-dnieto-test1-0-1.eu.svc.cluster.local</host>
                             <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
                         </replica>
                     </shard>
-                </cluster_01>
-                <cluster_02>
+                </all-replicated>
+                <all-sharded>
                     <!-- <secret></secret> -->
                     <shard>
                         <replica>
-                            <host>clickhouse-03</host>
+                            <host>chi-dnieto-test2-dnieto-test2-0-0.eu.svc.cluster.local</host>
                             <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
                         </replica>
                     </shard>
                     <shard>
                         <replica>
-                            <host>clickhouse-04</host>
+                            <host>chi-dnieto-test2-dnieto-test2-1-0.eu.svc.cluster.local</host>
                             <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
                         </replica>
                     </shard>
-                </cluster_02>
+                </all-sharded>
             </remote_servers>
             <max_workers>1</max_workers>
             <settings_pull>
@@ -54,10 +62,10 @@ data:
             </settings>
             <tables>
                 <table_ventas>
-                    <cluster_pull>cluster_01</cluster_pull>
+                    <cluster_pull>all-replicated</cluster_pull>
                     <database_pull>default</database_pull>
                     <table_pull>fact_venta_evento</table_pull>
-                    <cluster_push>cluster_02</cluster_push>
+                    <cluster_push>all-sharded</cluster_push>
                     <database_push>default</database_push>
                     <table_push>fact_venta_evento</table_push>
                     <engine>
@@ -72,23 +80,23 @@ data:
         </clickhouse>
     zookeeper.xml: |
         <clickhouse>
-        <logger>
-            <level>trace</level>
-            <size>100M</size>
-            <count>3</count>
-        </logger>
-        <zookeeper>
+            <logger>
+                <level>trace</level>
+                <size>100M</size>
+                <count>3</count>
+            </logger>
+            <zookeeper>
                 <node>
-                    <host>zoo1</host>
+                    <host>zookeeper-20539.eu.svc.cluster.local</host>
                     <port>2181</port>
                 </node>
                 <node>
-                    <host>zoo2</host>
+                    <host>zookeeper-20540.eu.svc.cluster.local</host>
                     <port>2181</port>
                 </node>
                 <node>
-                    <host>zoo3</host>
+                    <host>zookeeper-20705.eu.svc.cluster.local</host>
                     <port>2181</port>
                 </node>
-        </zookeeper>
+            </zookeeper>
         </clickhouse>

@@ -5,6 +5,7 @@ metadata:
   name: clickhouse-copier-test
   namespace: clickhouse-copier
 spec:
+  ttlSecondsAfterFinished: 86400
   template:
     spec:
       containers:
@@ -12,7 +13,7 @@ spec:
           image: clickhouse/clickhouse-server:21.8
           command:
             - clickhouse-copier
-            - --status
+            - "--task-upload-force=1"
             - "--config-file=$(CH_COPIER_CONFIG)"
             - "--task-path=$(CH_COPIER_TASKPATH)"
             - "--task-file=$(CH_COPIER_TASKFILE)"
@@ -41,7 +42,7 @@ spec:
               mountPath: /var/lib/clickhouse/tmp
         - name: sidecar-logger
           image: busybox:1.35
-          command: [/bin/sh, -c, tail -f /tmp/copier-logs/clickhouse-copier*/*.log]
+          command: [/bin/sh, -c, tail -n 1000 -f /tmp/copier-logs/clickhouse-copier*/*.log]
           volumeMounts:
             - name: copier-logs
               mountPath: /tmp/copier-logs
@@ -58,4 +59,4 @@ spec:
           persistentVolumeClaim:
             claimName: copier-logs
       restartPolicy: Never
-  backoffLimit: 1
+  backoffLimit: 3
