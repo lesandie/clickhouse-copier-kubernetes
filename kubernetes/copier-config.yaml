@@ -1,0 +1,102 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: copier-config
+  namespace: clickhouse-copier
+data:
+    task01.xml: |
+        <clickhouse>
+            <logger>
+                <level>trace</level>
+                <size>100M</size>
+                <count>3</count>
+            </logger>
+            <remote_servers>
+                <all-replicated>
+                    <shard>
+                        <replica>
+                            <host>chi-dnieto-test1-dnieto-test1-0-0.eu.svc.cluster.local</host>
+                            <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
+                        </replica>
+                        <replica>
+                            <host>chi-dnieto-test1-dnieto-test1-0-1.eu.svc.cluster.local</host>
+                            <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
+                        </replica>
+                    </shard>
+                </all-replicated>
+                <all-sharded>
+                    <!-- <secret></secret> -->
+                    <shard>
+                        <replica>
+                            <host>chi-dnieto-test2-dnieto-test2-0-0.eu.svc.cluster.local</host>
+                            <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
+                        </replica>
+                    </shard>
+                    <shard>
+                        <replica>
+                            <host>chi-dnieto-test2-dnieto-test2-1-0.eu.svc.cluster.local</host>
+                            <port>9000</port>
+                            <user>chcopier</user>
+                            <password>1qaz2wsx3edc</password>
+                        </replica>
+                    </shard>
+                </all-sharded>
+            </remote_servers>
+            <max_workers>1</max_workers>
+            <settings_pull>
+                <readonly>1</readonly>
+            </settings_pull>
+            <settings_push>
+                <readonly>0</readonly>
+            </settings_push>
+            <settings>
+                <connect_timeout>3</connect_timeout>
+                <insert_distributed_sync>1</insert_distributed_sync>
+            </settings>
+            <tables>
+                <table_ventas>
+                    <cluster_pull>all-replicated</cluster_pull>
+                    <database_pull>default</database_pull>
+                    <table_pull>fact_venta_evento</table_pull>
+                    <cluster_push>all-sharded</cluster_push>
+                    <database_push>default</database_push>
+                    <table_push>fact_venta_evento</table_push>
+                    <engine>
+                        Engine=ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/fact_venta_evento', '{replica}')
+                        PARTITION BY toYYYYMM(fecha_hora_pedido)
+                        ORDER BY (id_cadena, id_producto)
+                        SETTINGS index_granularity = 8192
+                    </engine>
+                    <sharding_key>rand()</sharding_key>
+                </table_ventas>
+            </tables>
+        </clickhouse>
+    zookeeper.xml: |
+        <clickhouse>
+            <logger>
+                <level>trace</level>
+                <size>100M</size>
+                <count>3</count>
+            </logger>
+            <zookeeper>
+                <node>
+                    <host>zookeeper-20539.eu.svc.cluster.local</host>
+                    <port>2181</port>
+                </node>
+                <node>
+                    <host>zookeeper-20540.eu.svc.cluster.local</host>
+                    <port>2181</port>
+                </node>
+                <node>
+                    <host>zookeeper-20705.eu.svc.cluster.local</host>
+                    <port>2181</port>
+                </node>
+            </zookeeper>
+        </clickhouse>

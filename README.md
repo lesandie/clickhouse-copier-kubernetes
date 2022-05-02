@@ -1,65 +1,51 @@
-# Clickhouse-copier in a docker container
+# Clickhouse-copier deployment in altinity.cloud
 
-## Installation
+Create a couple of cluster in the altinity.cloud platform and deploy Clickhouse-copier. It will copy data from one cluster to another.
+Some documentation to read:
+* https://kb.altinity.com/altinity-kb-setup-and-maintenance/altinity-kb-data-migration/altinity-kb-clickhouse-copier/
+* https://clickhouse.com/docs/en/operations/utilities/clickhouse-copier/
 
-Use docker-compose and create some ENV vars to magane the copier parameters.  In version 22+ positional argument names have been changed so to avoid debugging issues chck the new parameter names by:
+
+## Manual deployment
+
+Inside the kubernetes folder there are some manifests to create a deployment of the copier. This method is good for testing purposes
+and also if you want to have direct control of the deployment steps. It would be necessary to edit/change all the ```yaml``` files to your needs.
+
+### 1) Create the PVC:
+
+First create a namespace in which all the pods and resources are going to be deployed
 
 ```bash
-$ clickhouse-copier --help
-usage: clickhouse-copier --config-file <config-file> --task-path <task-path>
-Copies tables from one cluster to another
-
--C<file>, --config-file=<file>                                                         load configuration from a given file
--L<file>, --log-file=<file>                                                            use given log file
--E<file>, --errorlog-file=<file>                                                       use given log file for errors only
--P<file>, --pid-file=<file>                                                            use given pidfile
---daemon                                                                               Run application as a daemon.
---umask=mask                                                                           Set the daemon's umask (octal, e.g. 027).
---pidfile=path                                                                         Write the process ID of the application to given file.
---task-path=task-path                                                                  path to task in ZooKeeper
---task-file=task-file                                                                  path to task file for uploading in ZooKeeper to task-path
---task-upload-force=task-upload-force                                                  Force upload task-file even node already exists
---safe-mode                                                                            disables ALTER DROP PARTITION in case of errors
---copy-fault-probability=copy-fault-probability                                        the copying fails with specified probability (used to test partition state recovering)
---move-fault-probability=move-fault-probability                                        the moving fails with specified probability (used to test partition state recovering)
---log-level=log-level                                                                  sets log level
---base-dir=base-dir                                                                    base directory for copiers, consecutive copier launches will populate
-                                                                                       /base-dir/launch_id/* directories
---experimental-use-sample-offset=experimental-use-sample-offset                        Use SAMPLE OFFSET query instead of cityHash64(PRIMARY KEY) % n == k
---status                                                                               Get for status for current execution
---max-table-tries=max-table-tries                                                      Number of tries for the copy table task
---max-shard-partition-tries=max-shard-partition-tries                                  Number of tries for the copy one partition task
---max-shard-partition-piece-tries-for-alter=max-shard-partition-piece-tries-for-alter  Number of tries for final ALTER ATTACH to destination table
---retry-delay-ms=retry-delay-ms                                                        Delay between task retries
---help
+kubectl create namespace clickhouse-copier
 ```
 
-In docker mode do not use the ```--daemon```  and ```--status``` they will generate an error and the container will not launch (daemon problems and not allocating a TTY).
-Check the following ```docker-compose.yaml```
-to see which params are used.
+Then create the PVC using a ```storageClass``` gp2-encrypted class.
 
-```yaml
----
-version: "3"
-
-services:
-  clickhouse_copier:
-    container_name: clickhouse_copier
-    image: clickhouse/clickhouse-server:21.8
-    volumes:
-      - ./configs:/var/lib/clickhouse/tmp
-    command:
-      - clickhouse-copier
-      - "--config-file=${CH_COPIER_CONFIG}"
-      - "--task-path=${CH_COPIER_TASKPATH}"
-      - "--task-file=${CH_COPIER_TASKFILE}"
-      - "--base-dir=${CH_COPIER_BASEDIR}"
-    networks:
-      - altinity_default
-
-networks:
-  altinity_default:
-    external: true
+```bash
+kubectl create -f ./kubernetes/copier-pvc.yaml
 ```
 
-Also recommended to use the same docker network for zookeeper, clickhouse-server and clickhouse-copier.
+### 2) Create the configmap:
+
+The configmap has both files ```zookeeper.xml``` and ```task01.xml``` with the zookeeper node listing and the parameters for the task respectively.
+
+```bash
+kubectl create -f ./kubernetes/copier-configmap.yaml
+```
+
+The ```task01.xml``` file has many parameters to take into account explained in the [clickhouse-copier documentation](https://clickhouse.com/docs/en/operations/utilities/clickhouse-copier/). Important to note that it is needed a FQDN for the zookeeper nodes and clickhouse server that are valid for the cluster. As the deployment creates a new namespace, it is recommended to use a FQDN linked to a service. For example ```zookeeper-20705.eu.svc.cluster.local```.
+
+### 3) Create the job:
+
+Basically the job will download the official clickhouse image and will create a pod with 2 containers:
+  * clickhouse-copier: This container will run the clickhouse-copier utility.
+  * sidecar-logging: This container will be used to read the logs of the clickhouse-copier container because clickhouse-copier does not send the logs to ```stdout/stderr```. Also using ```---daemon``` is not sending the logs to ```stdout/stderr``` either.
+
+To check for the logs simply:
+
+```bash
+kubectl -n clickhouse-copier logs <podname> sidecar-logging
+```
+
+## Terraform deployment
+WIP
