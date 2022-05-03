@@ -44,6 +44,10 @@ spec:
         - name: sidecar-logger
           image: busybox:1.35
           command: [/bin/sh, -c, tail -n 1000 -f /tmp/copier-logs/clickhouse-copier*/*.log]
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
           volumeMounts:
             - name: copier-logs
               mountPath: /tmp/copier-logs
