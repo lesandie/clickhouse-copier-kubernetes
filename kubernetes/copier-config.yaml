@@ -8,9 +8,10 @@ data:
     task01.xml: |
         <clickhouse>
             <logger>
+                <console>true</console>
+                <log remove="remove"/>
+                <errorlog remove="remove"/>
                 <level>trace</level>
-                <size>100M</size>
-                <count>3</count>
             </logger>
             <remote_servers>
                 <all-replicated>
