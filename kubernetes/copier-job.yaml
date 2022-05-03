@@ -30,7 +30,7 @@ spec:
               value: "/var/lib/clickhouse/tmp"
           resources:
             limits:
-              cpu: "1"
+              cpu: "2"
               memory: 2048Mi
           volumeMounts:
             - name: copier-config
