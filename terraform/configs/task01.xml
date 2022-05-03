@@ -1,9 +1,10 @@
 <clickhouse>
     <!-- Configuration of clusters as in an ordinary server config -->
     <logger>
+        <console>true</console>
+        <log remove="remove"/>
+        <errorlog remove="remove"/>
         <level>trace</level>
-        <size>100M</size>
-        <count>3</count>
     </logger>
     <remote_servers>
         <cluster01>
@@ -16,7 +17,7 @@
                     <host>clickhouse-01</host>
                     <port>9000</port>
                     <user>default</user>
-                    <password>default</password>
+                    <password></password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
@@ -24,7 +25,7 @@
                     <host>clickhouse-02</host>
                     <port>9000</port>
                     <user>default</user>
-                    <password>default</password>
+                    <password></password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
@@ -42,7 +43,7 @@
                     <host>clickhouse-03</host>
                     <port>9000</port>
                     <user>default</user>
-                    <password>default</password>
+                    <password></password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
@@ -52,7 +53,7 @@
                     <host>clickhouse-04</host>
                     <port>9000</port>
                     <user>default</user>
-                    <password>default</password>
+                    <password></password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
