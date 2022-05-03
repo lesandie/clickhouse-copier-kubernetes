@@ -11,13 +11,14 @@ provider "kubernetes" {
   config_path = "~/.kube/config.altinity"
 }
 
-resource "kubernetes_namespace" "clickhouse_copier" {
-  metadata {
-    name = var.namespace_job
-  }
-}
+# Create a namespace for the job if needed
+#resource "kubernetes_namespace" "clickhouse_copier" {
+#  metadata {
+#    name = var.namespace_job
+#  }
+#}
 
-resource "kubernetes_job" "clickhouse_copier" {
+resource "kubernetes_job" "clickhouse_copier_job" {
   metadata {
     name = "clickhouse-copier"
     namespace = var.namespace_job
@@ -30,13 +31,32 @@ resource "kubernetes_job" "clickhouse_copier" {
           name    = "clickhouse-copier"
           image   = "clickhouse/clickhouse-server:21.8"
           command = [
-            "clickhouse-copier", "--config-file=${var.config_file_job}",
-            "--task-file=${var.task_file_job}", "--task-path=${var.task_path_job}",
-            "--base-dir=${var.base_dir_job}"
+            "clickhouse-copier", "--config-file=${var.config_file_path}",
+            "--task-file=${var.task_file_path}", "--task-path=${var.task_path}",
+            "--base-dir=${var.base_dir_path}", "--task-upload-force=1",
           ]
           volume_mount {
-            mount_path = "/var/lib/clickhouse/tmp"
+            mount_path = var.base_dir_path
+            name = "copier-logs"
+          }
+          volume_mount {
+            mount_path = var.config_file_path
+            sub_path = var.config_file
             name = "copier-config"
+          }
+          volume_mount {
+            mount_path = var.task_file_path
+            sub_path = var.task_file
+            name = "copier-config"
+          }
+        }
+        container {
+          name    = "sidecar-logger"
+          image   = "busybox:1.35"
+          command = ["/bin/sh", "-c", "tail -n 1000 -f /tmp/copier-logs/clickhouse-copier*/*.log"]
+          volume_mount {
+            mount_path = "/tmp/copier-logs"
+            name = "copier-logs"
           }
         }
         volume {
@@ -46,6 +66,12 @@ resource "kubernetes_job" "clickhouse_copier" {
             optional = true # <= rejected.
           }
         }
+        volume {
+          name = "copier-logs"
+          persistent_volume_claim {
+            claim_name = "copier-logs"
+          }
+        }
         restart_policy = "Never"
       }
     }
@@ -53,12 +79,12 @@ resource "kubernetes_job" "clickhouse_copier" {
   }
   wait_for_completion = true
   timeouts {
-    create = "2m"
+    create = "20m"
     update = "2m"
   }
 }
 
-resource "kubernetes_config_map" "copier-config" {
+resource "kubernetes_config_map" "copier_configmap" {
   metadata {
     name = "copier-config"
     namespace = var.namespace_job
@@ -69,7 +95,7 @@ resource "kubernetes_config_map" "copier-config" {
   }
 }
 
-resource "kubernetes_persistent_volume_claim" "copier-logs" {
+resource "kubernetes_persistent_volume_claim" "copier_logs_pvc" {
   metadata {
     name = "copier-logs"
     namespace = var.namespace_job
