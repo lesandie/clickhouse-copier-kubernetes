@@ -6,8 +6,7 @@
         <count>3</count>
     </logger>
     <remote_servers>
-
-        <cluster_01>
+        <cluster01>
             <shard>
                 <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
                 <!-- <internal_replication>false</internal_replication> -->
@@ -16,19 +15,23 @@
                 <replica>
                     <host>clickhouse-01</host>
                     <port>9000</port>
+                    <user>default</user>
+                    <password>default</password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
                 <replica>
                     <host>clickhouse-02</host>
                     <port>9000</port>
+                    <user>default</user>
+                    <password>default</password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
             </shard>
-        </cluster_01>
-
-        <cluster_02>
+        </cluster01>
+        <!-- Dest cluster -->
+        <cluster02>
             <!-- <secret></secret> -->
             <shard>
                 <!-- Optional. Whether to write data to just one of the replicas. Default: false (write data to all replicas). -->
@@ -38,6 +41,8 @@
                 <replica>
                     <host>clickhouse-03</host>
                     <port>9000</port>
+                    <user>default</user>
+                    <password>default</password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
@@ -46,27 +51,24 @@
                 <replica>
                     <host>clickhouse-04</host>
                     <port>9000</port>
+                    <user>default</user>
+                    <password>default</password>
                     <!-- Optional. Priority of the replica for load_balancing. Default: 1 (less value has more priority). -->
                     <!-- <priority>1</priority> -->
                 </replica>
             </shard>
-        </cluster_02>
-
+        </cluster02>
     </remote_servers>
-
     <!-- How many simultaneously active workers are possible. If you run more workers superfluous workers will sleep. -->
     <max_workers>1</max_workers>
-
     <!-- Setting used to fetch (pull) data from source cluster tables -->
     <settings_pull>
         <readonly>1</readonly>
     </settings_pull>
-
     <!-- Setting used to insert (push) data to destination cluster tables -->
     <settings_push>
         <readonly>0</readonly>
     </settings_push>
-
     <!-- Common setting for fetch (pull) and insert (push) operations. Also, copier process context uses it.
          They are overlaid by <settings_pull/> and <settings_push/> respectively. -->
     <settings>
@@ -74,7 +76,6 @@
         <!-- Sync insert is set forcibly, leave it here just in case. -->
         <insert_distributed_sync>1</insert_distributed_sync>
     </settings>
-
     <!-- Copying tasks description.
          You could specify several table task in the same task description (in the same ZooKeeper node), they will be performed
          sequentially.
@@ -83,12 +84,12 @@
         <!-- A table task, copies one table. -->
         <table_ventas>
             <!-- Source cluster name (from <remote_servers/> section) and tables in it that should be copied -->
-            <cluster_pull>cluster_01</cluster_pull>
+            <cluster_pull>cluster01</cluster_pull>
             <database_pull>default</database_pull>
             <table_pull>fact_venta_evento</table_pull>
 
             <!-- Destination cluster name and tables in which the data should be inserted -->
-            <cluster_push>cluster_02</cluster_push>
+            <cluster_push>cluster02</cluster_push>
             <database_push>default</database_push>
             <table_push>fact_venta_evento</table_push>
 

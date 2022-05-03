@@ -68,3 +68,19 @@ resource "kubernetes_config_map" "copier-config" {
     "task01.yml" = "${file("${path.module}/configs/task01.xml")}"
   }
 }
+
+resource "kubernetes_persistent_volume_claim" "copier-logs" {
+  metadata {
+    name = "copier-logs"
+    namespace = var.namespace_job
+  }
+  spec {
+    access_modes = ["ReadWriteMany"]
+    storage_class_name = "gp2-encrypted"
+    resources {
+      requests = {
+        storage = "1Gi"
+      }
+    }
+  }
+}
