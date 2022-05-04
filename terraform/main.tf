@@ -11,12 +11,11 @@ provider "kubernetes" {
   config_path = "~/.kube/config.altinity"
 }
 
-# Create a namespace for the job if needed
-#resource "kubernetes_namespace" "clickhouse_copier" {
-#  metadata {
-#    name = var.namespace_job
-#  }
-#}
+resource "kubernetes_namespace" "clickhouse_copier" {
+  metadata {
+    name = var.namespace_job
+  }
+}
 
 resource "kubernetes_job" "clickhouse_copier_job" {
   metadata {

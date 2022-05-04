@@ -33,7 +33,10 @@ The configmap has both files ```zookeeper.xml``` and ```task01.xml``` with the z
 kubectl create -f ./kubernetes/copier-configmap.yaml
 ```
 
-The ```task01.xml``` file has many parameters to take into account explained in the [clickhouse-copier documentation](https://clickhouse.com/docs/en/operations/utilities/clickhouse-copier/). Important to note that it is needed a FQDN for the zookeeper nodes and clickhouse server that are valid for the cluster. As the deployment creates a new namespace, it is recommended to use a FQDN linked to a service. For example ```zookeeper-20705.eu.svc.cluster.local```.
+The ```task01.xml``` file has many parameters to take into account explained in the [clickhouse-copier documentation](https://clickhouse.com/docs/en/operations/utilities/clickhouse-copier/). Important to note that it is needed a FQDN for the zookeeper nodes and clickhouse server that are valid for the cluster. As the deployment creates a new namespace, it is recommended to use a FQDN linked to a service. For example ```zookeeper-20705.eu.svc.cluster.local```. This file should be adapted to both clusters topologies and to the needs of the user.
+
+The ```zookeeper.xml``` file is pretty straightforward with a simple 3 node ensemble configuration.
+
 
 ### 3) Create the job:
 
@@ -48,4 +51,5 @@ kubectl -n clickhouse-copier logs <podname> sidecar-logging
 ```
 
 ## Terraform deployment
-WIP
+
+Just review the terraform directory and execute ```terraform init``` and ```terraform plan``` to check. After review the plan, execute ```terraform apply``` to deploy the copier.
