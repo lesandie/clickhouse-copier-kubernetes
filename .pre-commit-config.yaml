@@ -1,4 +1,3 @@
-exclude: "\\.snap$"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.2.0
@@ -15,17 +14,26 @@ repos:
     hooks:
       - id: xmllint
 
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.26.3
-    hooks:
-      - id: yamllint
-        args: [-c=.yamllint]
-
   # Terraform
   - repo: https://github.com/gruntwork-io/pre-commit
     rev: v0.1.17
     hooks:
       - id: tflint
       - id: shellcheck
-      - id: terraform-fmt
-      - id: terraform-validate
+
+  # Python
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        args: ["--config", "./configs/clickhouse-copier/.flake8"]
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black

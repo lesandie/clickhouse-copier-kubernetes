@@ -14,11 +14,11 @@ spec:
           image: clickhouse/clickhouse-server:21.8
           command:
             - clickhouse-copier
-            - "--task-upload-force=1"
-            - "--config-file=$(CH_COPIER_CONFIG)"
-            - "--task-path=$(CH_COPIER_TASKPATH)"
-            - "--task-file=$(CH_COPIER_TASKFILE)"
-            - "--base-dir=$(CH_COPIER_BASEDIR)"
+            - --task-upload-force=1
+            - --config-file=$(CH_COPIER_CONFIG)
+            - --task-path=$(CH_COPIER_TASKPATH)
+            - --task-file=$(CH_COPIER_TASKFILE)
+            - --base-dir=$(CH_COPIER_BASEDIR)
           env:
             - name: CH_COPIER_CONFIG
               value: "/var/lib/clickhouse/tmp/zookeeper.xml"
@@ -30,7 +30,7 @@ spec:
               value: "/var/lib/clickhouse/tmp"
           resources:
             limits:
-              cpu: "2"
+              cpu: "1"
               memory: 2048Mi
           volumeMounts:
             - name: copier-config
@@ -43,7 +43,7 @@ spec:
               mountPath: /var/lib/clickhouse/tmp
         - name: sidecar-logger
           image: busybox:1.35
-          command: [/bin/sh, -c, tail -n 1000 -f /tmp/copier-logs/clickhouse-copier*/*.log]
+          command: ['/bin/sh', '-c', 'tail', '-n', '1000', '-f', '/tmp/copier-logs/clickhouse-copier*/*.log']
           resources:
             limits:
               cpu: "1"

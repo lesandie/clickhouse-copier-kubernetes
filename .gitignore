@@ -4,5 +4,8 @@
 *.tfstate*
 .vscode
 csv/
-.pre-commit-config.yaml
-.yamllint
+__pycache__/
+.pytest_cache/
+*.egg*
+build/
+dist/

@@ -1,0 +1,7 @@
+Fastapi==0.77.1
+uvicorn==0.17.6
+Pytest==7.1.2
+pytest-mock==3.7.0
+DateTime==4.4
+ujson==5.3.0
+requests==2.27.1

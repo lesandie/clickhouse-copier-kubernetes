@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: log-reader-api
+  namespace: clickhouse-copier
+spec:
+  containers:
+    - name: log-reader-api
+      image: altinity/logreader:latest
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+      volumeMounts:
+        - name: copier-logs
+          mountPath: /tmp/copier-logs
+  volumes:
+    - name: copier-logs
+      persistentVolumeClaim:
+        claimName: copier-logs
+  restartPolicy: Never
