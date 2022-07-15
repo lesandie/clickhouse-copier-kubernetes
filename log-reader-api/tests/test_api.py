@@ -1,13 +1,13 @@
 import pytest
 import ujson
-from app.main import list_dir, logreader
+from app.main import list_dir, log_reader
 from fastapi.testclient import TestClient
 
 TEST_DIR = "tests/data"
 # listdir problems relative paths to fix
 BASE_DIR_LIST = ["clickhouse-copier_20220519202024_1"]
 
-client = TestClient(logreader)
+client = TestClient(log_reader)
 
 
 def test_root():
@@ -44,13 +44,13 @@ def test_log(log_response: dict, mocker):
 
 
 @pytest.fixture
-def errorlog_response():
-    with open(f"{TEST_DIR}/errorlog_response.jsonl", "r") as f:
+def error_log_response():
+    with open(f"{TEST_DIR}/error_log_response.jsonl", "r") as f:
         return ujson.load(f)
 
 
-def test_errorlog(errorlog_response: dict, mocker):
+def test_error_log(error_log_response: dict, mocker):
     mocker.patch("app.main.list_dir", return_value=BASE_DIR_LIST)
-    response = client.get("/v0/job/20220519202024_1/errorlog/")
+    response = client.get("/v0/job/20220519202024_1/error_log/")
     assert response.status_code == 200
-    assert response.json() == errorlog_response
+    assert response.json() == error_log_response

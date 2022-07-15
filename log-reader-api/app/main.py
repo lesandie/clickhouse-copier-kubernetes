@@ -30,10 +30,10 @@ def list_dir(basedir: str) -> List[str]:
     Returns a list of all the directories
     """
     listdir = [
-        dir
-        for dir in os.listdir(basedir)
-        if os.path.isdir(os.path.join(basedir, dir))
-        and dir.find("clickhouse-copier_") != -1
+        dir_
+        for dir_ in os.listdir(basedir)
+        if os.path.isdir(os.path.join(basedir, dir_))
+        and dir_.find("clickhouse-copier_") != -1
     ]
 
     return listdir
@@ -68,14 +68,14 @@ def list_jobs(basedir: str) -> Dict[str, Job]:
 
         return job_list
 
-    except (FileNotFoundError):
+    except FileNotFoundError:
         raise HTTPException(
             status_code=404,
             detail="Does the base directory exist? or is the PVC deployed?",
         )
 
 
-def cat_logs(filename) -> str:
+def cat_logs(filename) -> list[str]:
     """
     cat the logfile
     """
@@ -102,30 +102,30 @@ def check_filepath(filepath) -> bool:
 
 
 # FastAPI app
-logreader = FastAPI()
+log_reader = FastAPI()
 
 
 # livenessProbe
-@logreader.get("/")
+@log_reader.get("/")
 async def root():
     return {"message": "OK"}
 
 
 # List job executions
-@logreader.get(
+@log_reader.get(
     "/v0/jobs/",
     response_model=JobList,
     response_model_exclude_unset=True
     # response_model_exclude=["log_path", "log_error_path"],
 )
-async def list():
+async def list_():
     # BaseModel property names must match the keys in the dict returned for pydantic validation
     job_list = list_jobs(BASE_DIR)
     return {"job_list": job_list}
 
 
 # Get job execution cat log
-@logreader.get("/v0/job/{job_id}/log/")
+@log_reader.get("/v0/job/{job_id}/log/")
 async def log(job_id):
     try:
         job_list = list_jobs(BASE_DIR)
@@ -138,12 +138,12 @@ async def log(job_id):
         )
 
 
-# Get job execution cat errorlog
-@logreader.get("/v0/job/{job_id}/errorlog/")
-async def errorlog(job_id):
+# Get job execution cat error_log
+@log_reader.get("/v0/job/{job_id}/error_log/")
+async def error_log(job_id):
     try:
         job_list = list_jobs(BASE_DIR)
-        log_file = job_list[job_id]["log_error_path"]
+        log_file = job_list[job_id]['log_error_path']
         return {"data": cat_logs(log_file)}
     except KeyError:
         raise HTTPException(
