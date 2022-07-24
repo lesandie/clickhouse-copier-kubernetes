@@ -143,7 +143,7 @@ async def log(job_id):
 async def error_log(job_id):
     try:
         job_list = list_jobs(BASE_DIR)
-        log_file = job_list[job_id]['log_error_path']
+        log_file = job_list[job_id]["log_error_path"]
         return {"data": cat_logs(log_file)}
     except KeyError:
         raise HTTPException(
