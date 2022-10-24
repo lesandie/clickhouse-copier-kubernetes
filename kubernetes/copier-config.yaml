@@ -17,16 +17,16 @@ data:
                 <all-replicated>
                     <shard>
                         <replica>
-                            <host>chi-dnieto-test1-dnieto-test1-0-0.eu.svc.cluster.local</host>
+                            <host>clickhouse01.svc.cluster.local</host>
                             <port>9000</port>
                             <user>chcopier</user>
-                            <password>1qaz2wsx3edc</password>
+                            <password>pass</password>
                         </replica>
                         <replica>
-                            <host>chi-dnieto-test1-dnieto-test1-0-1.eu.svc.cluster.local</host>
+                            <host>clickhouse02.svc.cluster.local</host>
                             <port>9000</port>
                             <user>chcopier</user>
-                            <password>1qaz2wsx3edc</password>
+                            <password>pass</password>
                         </replica>
                     </shard>
                 </all-replicated>
@@ -34,18 +34,18 @@ data:
                     <!-- <secret></secret> -->
                     <shard>
                         <replica>
-                            <host>chi-dnieto-test2-dnieto-test2-0-0.eu.svc.cluster.local</host>
+                            <host>clickhouse03.svc.cluster.local</host>
                             <port>9000</port>
                             <user>chcopier</user>
-                            <password>1qaz2wsx3edc</password>
+                            <password>pass</password>
                         </replica>
                     </shard>
                     <shard>
                         <replica>
-                            <host>chi-dnieto-test2-dnieto-test2-1-0.eu.svc.cluster.local</host>
+                            <host>clickhouse03.svc.cluster.local</host>
                             <port>9000</port>
                             <user>chcopier</user>
-                            <password>1qaz2wsx3edc</password>
+                            <password>pass</password>
                         </replica>
                     </shard>
                 </all-sharded>
@@ -62,17 +62,17 @@ data:
                 <insert_distributed_sync>1</insert_distributed_sync>
             </settings>
             <tables>
-                <table_ventas>
+                <table_sales>
                     <cluster_pull>all-replicated</cluster_pull>
                     <database_pull>default</database_pull>
-                    <table_pull>fact_venta_evento</table_pull>
+                    <table_pull>fact_sales_event</table_pull>
                     <cluster_push>all-sharded</cluster_push>
                     <database_push>default</database_push>
-                    <table_push>fact_venta_evento</table_push>
+                    <table_push>fact_sales_event</table_push>
                     <engine>
-                        Engine=ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/fact_venta_evento', '{replica}')
-                        PARTITION BY toYYYYMM(fecha_hora_pedido)
-                        ORDER BY (id_cadena, id_producto)
+                        Engine=ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/fact_sales_event', '{replica}')
+                        PARTITION BY toYYYYMM(timestamp)
+                        ORDER BY (channel_id, product_id)
                         SETTINGS index_granularity = 8192
                     </engine>
                     <sharding_key>rand()</sharding_key>
@@ -88,15 +88,15 @@ data:
             </logger>
             <zookeeper>
                 <node>
-                    <host>zookeeper-20539.eu.svc.cluster.local</host>
+                    <host>zookeeper1.svc.cluster.local</host>
                     <port>2181</port>
                 </node>
                 <node>
-                    <host>zookeeper-20540.eu.svc.cluster.local</host>
+                    <host>zookeeper2.svc.cluster.local</host>
                     <port>2181</port>
                 </node>
                 <node>
-                    <host>zookeeper-20705.eu.svc.cluster.local</host>
+                    <host>zookeeper3.svc.cluster.local</host>
                     <port>2181</port>
                 </node>
             </zookeeper>
