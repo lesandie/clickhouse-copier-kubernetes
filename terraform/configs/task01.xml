@@ -83,16 +83,16 @@
     -->
     <tables>
         <!-- A table task, copies one table. -->
-        <table_ventas>
+        <table_sales>
             <!-- Source cluster name (from <remote_servers/> section) and tables in it that should be copied -->
             <cluster_pull>cluster01</cluster_pull>
             <database_pull>default</database_pull>
-            <table_pull>fact_venta_evento</table_pull>
+            <table_pull>fact_sales_event</table_pull>
 
             <!-- Destination cluster name and tables in which the data should be inserted -->
             <cluster_push>cluster02</cluster_push>
             <database_push>default</database_push>
-            <table_push>fact_venta_evento</table_push>
+            <table_push>fact_sales_event</table_push>
 
             <!-- Engine of destination tables.
                  If destination tables have not be created, workers create them using columns definition from source tables and engine
@@ -104,9 +104,9 @@
                  system.parts table.
             -->
             <engine>
-                Engine=ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/fact_venta_evento', '{replica}')
-                PARTITION BY toYYYYMM(fecha_hora_pedido)
-                ORDER BY (id_cadena, id_producto)
+                Engine=ReplicatedMergeTree('/clickhouse/{cluster}/tables/{shard}/fact_sales_event', '{replica}')
+                PARTITION BY toYYYYMM(timestamp)
+                ORDER BY (channel_id, product_id)
                 SETTINGS index_granularity = 8192
             </engine>
 
@@ -134,7 +134,7 @@
                 ...
             </enabled_partitions>
     -->
-        </table_ventas>
+        </table_sales>
 
         <!-- Next table to copy. It is not copied until previous table is copying.
         <table_visits>
