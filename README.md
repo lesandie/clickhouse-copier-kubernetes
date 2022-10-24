@@ -19,7 +19,7 @@ First create a namespace in which all the pods and resources are going to be dep
 kubectl create namespace clickhouse-copier
 ```
 
-Then create the PVC using a ```storageClass``` gp2-encrypted class.
+Then create the PVC using a ```storageClass``` gp2-encrypted class or use any other storageClass from other providers.
 
 ```bash
 kubectl create -f ./kubernetes/copier-pvc.yaml
