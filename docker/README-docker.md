@@ -3,7 +3,7 @@
 ## Installation
 
 This is intended for testing purposes only.
-Use docker-compose and create some ENV vars to magane the copier parameters.  In version 22+ positional argument names have been changed so to avoid debugging issues chck the new parameter names by:
+Use docker-compose and create some ENV vars to manage the copier parameters.  In version 22+ positional argument names have been changed so to avoid debugging issues check the new parameter names by:
 
 ```bash
 $ clickhouse-copier --help
@@ -35,7 +35,7 @@ Copies tables from one cluster to another
 --help
 ```
 
-In docker mode do not use the ```--daemon```  and ```--status``` they will generate an error and the container will not launch (daemon problems and not allocating a TTY).
+Do not use the ```--daemon```  and ```--status``` they will generate an error and the container will not launch (daemon problems and not allocating a TTY). 
 Check the following ```docker-compose.yaml```
 to see which params are used.
 
@@ -56,10 +56,10 @@ services:
       - "--task-file=${CH_COPIER_TASKFILE}"
       - "--base-dir=${CH_COPIER_BASEDIR}"
     networks:
-      - altinity_default
+      - default
 
 networks:
-  altinity_default:
+  default:
     external: true
 ```
 
