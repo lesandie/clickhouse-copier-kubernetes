@@ -1,4 +1,4 @@
-# Clickhouse-copier deployment in altinity.cloud
+# Clickhouse-copier deployment in kubernetes
 
 Create a couple of cluster in the altinity.cloud platform and deploy Clickhouse-copier. It will copy data from one cluster to another.
 Some documentation to read:
