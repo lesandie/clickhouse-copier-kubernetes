@@ -17,8 +17,8 @@ services:
       #- --task-upload-force
       - "--base-dir=${CH_COPIER_BASEDIR}"
     networks:
-      - altinity_default
+      - default
 
 networks:
-  altinity_default:
+  default:
     external: true
