@@ -13,5 +13,5 @@ services:
         - altinity_default
 
 networks:
-  altinity_default:
+  default:
     external: true
