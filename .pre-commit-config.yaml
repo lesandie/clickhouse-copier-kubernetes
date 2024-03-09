@@ -1,62 +1,32 @@
 exclude: "\\.snap$"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-json
 
   # python
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+    rev: v0.3.2
     hooks:
-      - id: flake8
-        args: [--config, .flake8]
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-
-  - repo: https://github.com/psf/black
-    rev: 23.1.0
-    hooks:
-      - id: black
+      # Run the linter.
+      - id: ruff
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
 
   # Terraform
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.18
+    rev: v0.1.23
     hooks:
       - id: tflint
       - id: shellcheck
 
   - repo: https://github.com/gruntwork-io/pre-commit
-    rev: v0.1.18
+    rev: v0.1.23
     hooks:
       - id: terraform-fmt
 
-  # sql formatter
-  - repo: https://github.com/sqlfluff/sqlfluff
-    rev: 2.0.0a4
-    hooks:
-      # additional_dependencies: ['<dbt-adapter>', 'sqlfluff-templater-dbt']
-      - id: sqlfluff-lint
-        args: [--exclude-rules, "L008,L011,L031",
-              --dialect, "clickhouse",
-        ]
-
-  # security
-  - repo: https://github.com/PyCQA/bandit
-    rev: v1.0.5
-    hooks:
-    - id: python-bandit-vulnerability-check
-      args: [--skip, "B101", --recursive]
-
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.3.1
-    hooks:
-    - id: python-safety-dependencies-check
-      files: pyproject.toml
-      # args: ["--ignore=39153,39652"]
-      args: ["--short-report"]
