@@ -3,14 +3,14 @@ version: "3.7"
 services:
     log_reader_api:
       build: .
-      image: altinity/log-reader-api
+      image: local/log-reader-api
       container_name: log-reader-api
       ports:
         - "8000:8000"
       environment:
         - COPIER_LOGS=${COPIER_LOGS:-/tmp/copier-logs}
       networks:
-        - altinity_default
+        - default
 
 networks:
   default:
